@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase
 
-from idgi.core.parser import PythonASTParser, BatchParser
+from idgi.core.parser import BatchParser, PythonASTParser
 
 
 class TestPythonASTParser(TestCase):

@@ -6,7 +6,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .parser import BatchParser, ModuleInfo
 from .scanner import DirectoryScanner, ScanResult
@@ -208,7 +208,7 @@ class CodebaseAnalyzer:
                 total_functions += len(class_info.methods)
 
                 # Count nested classes
-                def count_nested(cls):
+                def count_nested(cls: Any) -> int:
                     count = len(cls.nested_classes)
                     for nested in cls.nested_classes:
                         count += count_nested(nested)
@@ -309,7 +309,7 @@ class CodebaseAnalyzer:
 
     def get_complexity_metrics(
         self, analysis_result: AnalysisResult
-    ) -> Dict[str, Dict[str, int]]:
+    ) -> Dict[str, Dict[str, float]]:
         """
         Calculate complexity metrics for the codebase.
 

@@ -72,7 +72,7 @@ class PythonASTParser:
     Parses Python source files using AST to extract structural information.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.current_class_stack: List[str] = []
 
     def parse_file(self, file_path: Path) -> ModuleInfo:
@@ -286,9 +286,11 @@ class PythonASTParser:
         if isinstance(decorator, ast.Name):
             return decorator.id
         elif isinstance(decorator, ast.Attribute):
-            return self._get_name_from_node(decorator)
+            name = self._get_name_from_node(decorator)
+            return name if name is not None else str(decorator)
         elif isinstance(decorator, ast.Call):
-            return self._get_name_from_node(decorator.func)
+            name = self._get_name_from_node(decorator.func)
+            return name if name is not None else str(decorator)
         else:
             return str(decorator)
 
@@ -324,7 +326,7 @@ class BatchParser:
     Parse multiple Python files efficiently.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.parser = PythonASTParser()
 
     def parse_files(self, file_paths: List[Path]) -> Dict[Path, ModuleInfo]:

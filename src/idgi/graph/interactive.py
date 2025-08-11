@@ -436,7 +436,7 @@ class InteractiveGraphExplorer:
         current_level = set([self.current_node])
 
         for _ in range(depth):
-            next_level = set()
+            next_level: set[str] = set()
             for node in current_level:
                 next_level.update(self.graph.predecessors(node))
                 next_level.update(self.graph.successors(node))

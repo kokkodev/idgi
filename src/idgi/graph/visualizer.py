@@ -3,7 +3,7 @@ Graph visualization for terminal (ASCII) output and Graphviz export.
 """
 
 from io import StringIO
-from typing import Dict, Optional, Set
+from typing import Any, Dict, Optional, Set, cast
 
 import networkx as nx
 from rich.console import Console
@@ -68,9 +68,10 @@ class ASCIIGraphVisualizer:
         )
 
         # Render to string
-        console = Console(file=StringIO(), width=120)
+        string_io = StringIO()
+        console = Console(file=string_io, width=120)
         console.print(tree)
-        return console.file.getvalue()
+        return string_io.getvalue()
 
     def visualize_network(
         self, graph: nx.DiGraph, layout: str = "spring", max_nodes: int = 50
@@ -103,7 +104,7 @@ class ASCIIGraphVisualizer:
         output.write("=" * 60 + "\n\n")
 
         # Group nodes by type if available
-        node_types = {}
+        node_types: Dict[str, list[str]] = {}
         for node in subgraph.nodes():
             node_type = subgraph.nodes[node].get("type", "unknown")
             if node_type not in node_types:
@@ -162,7 +163,7 @@ class ASCIIGraphVisualizer:
                 node for node in graph.nodes() if graph.in_degree(node) == min_in_degree
             ]
 
-        visited = set()
+        visited: Set[str] = set()
 
         for root in sorted(roots):
             if root not in visited:
@@ -216,7 +217,7 @@ class ASCIIGraphVisualizer:
                 pass
 
             # Node types (if available)
-            node_types = {}
+            node_types: Dict[str, int] = {}
             for node in graph.nodes():
                 node_type = graph.nodes[node].get("type", "unknown")
                 node_types[node_type] = node_types.get(node_type, 0) + 1
@@ -224,9 +225,10 @@ class ASCIIGraphVisualizer:
             for node_type, count in sorted(node_types.items()):
                 table.add_row(f"{node_type.title()} Nodes", str(count))
 
-        console = Console(file=StringIO())
+        string_io = StringIO()
+        console = Console(file=string_io)
         console.print(table)
-        return console.file.getvalue()
+        return string_io.getvalue()
 
     def find_important_nodes(self, graph: nx.DiGraph, limit: int = 10) -> str:
         """
@@ -274,9 +276,10 @@ class ASCIIGraphVisualizer:
                 str(total_deg),
             )
 
-        console = Console(file=StringIO())
+        string_io = StringIO()
+        console = Console(file=string_io)
         console.print(table)
-        return console.file.getvalue()
+        return string_io.getvalue()
 
     def _find_root_node(self, graph: nx.DiGraph) -> str:
         """Find the best root node for tree visualization."""
@@ -285,10 +288,10 @@ class ASCIIGraphVisualizer:
 
         if roots:
             # If multiple roots, pick the one with most outgoing connections
-            return max(roots, key=lambda n: graph.out_degree(n))
+            return cast(str, max(roots, key=lambda n: graph.out_degree(n)))
 
         # If no clear root, pick node with highest out-degree
-        return max(graph.nodes(), key=lambda n: graph.out_degree(n))
+        return cast(str, max(graph.nodes(), key=lambda n: graph.out_degree(n)))
 
     def _add_tree_children(
         self,
@@ -395,7 +398,7 @@ class GraphvizRenderer:
     Renders graphs using Graphviz for high-quality output.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the Graphviz renderer."""
         if not HAS_GRAPHVIZ:
             raise ImportError(
@@ -495,13 +498,16 @@ class GraphvizRenderer:
 
             dot.edge(source, target, **edge_attrs)
 
-        return dot.pipe(
-            format=output_format,
-            encoding="utf-8" if output_format in ["svg", "dot"] else None,
+        return cast(
+            str,
+            dot.pipe(
+                format=output_format,
+                encoding="utf-8" if output_format in ["svg", "dot"] else None,
+            ),
         )
 
     def _format_graphviz_label(
-        self, node: str, node_data: Dict, max_length: int
+        self, node: str, node_data: Dict[str, str], max_length: int
     ) -> str:
         """Format node label for Graphviz display."""
         # Start with node name
@@ -544,9 +550,10 @@ class GraphvizRenderer:
         elif node_type == "function":
             if node_data.get("is_async", False):
                 info_lines.append("async")
-            args = node_data.get("args", [])
-            if args:
-                info_lines.append(f"({len(args)} args)")
+            args: Any = node_data.get("args", [])
+            if isinstance(args, list):
+                if args:
+                    info_lines.append(f"({len(args)} args)")
 
         if info_lines:
             label += "\\n" + "\\n".join(info_lines)

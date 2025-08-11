@@ -6,7 +6,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Generator, List, Optional, Tuple
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 from ..utils.filters import PathFilter
 
@@ -181,7 +181,9 @@ class DirectoryScanner:
         except Exception:
             return 0
 
-    def get_package_hierarchy(self, packages: Dict[str, List[Path]]) -> Dict[str, Dict]:
+    def get_package_hierarchy(
+        self, packages: Dict[str, List[Path]]
+    ) -> Dict[str, Dict[str, Any]]:
         """
         Build a hierarchical representation of packages.
 
@@ -191,7 +193,7 @@ class DirectoryScanner:
         Returns:
             Nested dictionary representing package hierarchy
         """
-        hierarchy = {}
+        hierarchy: Dict[str, Any] = {}
 
         for package_name in packages.keys():
             if package_name == ".":

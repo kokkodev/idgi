@@ -34,12 +34,13 @@ class FileSystemCache:
         self.metadata_file = self.cache_dir / "metadata.json"
         self.metadata = self._load_metadata()
 
-    def _load_metadata(self) -> Dict[str, Any]:
+    def _load_metadata(self) -> dict[str, Any]:
         """Load cache metadata."""
         if self.metadata_file.exists():
             try:
                 with open(self.metadata_file, "r") as f:
-                    return json.load(f)
+                    result = json.load(f)
+                    return result if isinstance(result, dict) else {}
             except Exception:
                 return {}
         return {}
@@ -65,11 +66,11 @@ class FileSystemCache:
 
     def _get_codebase_fingerprint(self, root_path: Path) -> Dict[str, Any]:
         """Generate fingerprint of codebase for cache validation."""
-        fingerprint = {
+        fingerprint: Dict[str, Any] = {
             "files": {},
             "total_files": 0,
             "total_size": 0,
-            "last_modified": 0,
+            "last_modified": 0.0,
         }
 
         try:
@@ -83,10 +84,12 @@ class FileSystemCache:
                         "mtime": stat.st_mtime,
                     }
 
-                    fingerprint["total_files"] += 1
-                    fingerprint["total_size"] += stat.st_size
+                    fingerprint["total_files"] = int(fingerprint["total_files"]) + 1
+                    fingerprint["total_size"] = (
+                        int(fingerprint["total_size"]) + stat.st_size
+                    )
                     fingerprint["last_modified"] = max(
-                        fingerprint["last_modified"], stat.st_mtime
+                        float(fingerprint["last_modified"]), stat.st_mtime
                     )
 
         except Exception:
@@ -125,7 +128,8 @@ class FileSystemCache:
 
         try:
             with open(cache_file, "rb") as f:
-                return pickle.load(f)
+                result = pickle.load(f)
+                return result if isinstance(result, AnalysisResult) else None
         except Exception:
             # Cache file corrupted, remove it
             try:

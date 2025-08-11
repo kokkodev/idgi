@@ -8,7 +8,8 @@ from typing import Dict, List, Optional, Union
 
 import networkx as nx
 
-from ..graph.visualizer import GraphvizRenderer, HAS_GRAPHVIZ
+from ..core.analyzer import AnalysisResult
+from ..graph.visualizer import HAS_GRAPHVIZ, GraphvizRenderer
 
 
 class GraphExporter:
@@ -26,7 +27,7 @@ class GraphExporter:
         "graphml": "GraphML format",
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the exporter."""
         self.graphviz_renderer = None
         if HAS_GRAPHVIZ:
@@ -126,7 +127,11 @@ class GraphExporter:
             output_path.write_text(output_data, encoding="utf-8")
         else:
             # PNG, PDF are binary formats
-            output_path.write_bytes(output_data)
+            output_path.write_bytes(
+                output_data.encode("utf-8")
+                if isinstance(output_data, str)
+                else output_data
+            )
 
         return True
 
@@ -212,7 +217,7 @@ class GraphExporter:
 
     def _limit_graph_size(self, graph: nx.DiGraph, max_nodes: int) -> nx.DiGraph:
         """Limit graph to most important nodes."""
-        if len(graph.nodes()) <= max_nodes:
+        if len(list(graph.nodes())) <= max_nodes:
             return graph
 
         # Use degree centrality to select most important nodes
@@ -285,7 +290,7 @@ class GraphExporter:
             elif relationship == "calls":
                 attrs.append("color=red")
 
-            attrs_str = f' [{", ".join(attrs)}]' if attrs else ""
+            attrs_str = f" [{', '.join(attrs)}]" if attrs else ""
             lines.append(f"  {source_id} -> {target_id}{attrs_str};")
 
         lines.append("}")
@@ -326,7 +331,7 @@ class GraphExporter:
 
 
 def export_analysis_results(
-    analysis_result,
+    analysis_result: AnalysisResult,
     output_dir: Union[str, Path],
     formats: Optional[List[str]] = None,
     graph_types: Optional[List[str]] = None,

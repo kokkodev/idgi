@@ -31,7 +31,7 @@ def setup_logging(verbose: bool = False) -> None:
     )
 
 
-def cmd_scan(args) -> None:
+def cmd_scan(args: argparse.Namespace) -> None:
     """Handle scan subcommand."""
     console = Console()
 
@@ -109,7 +109,7 @@ def cmd_scan(args) -> None:
         console.print(error_table)
 
 
-def cmd_graph(args) -> None:
+def cmd_graph(args: argparse.Namespace) -> None:
     """Handle graph subcommand."""
     console = Console()
 
@@ -148,7 +148,7 @@ def cmd_graph(args) -> None:
     builder = GraphBuilder(analysis_result)
     graph = builder.build_graph(graph_type, max_nodes=args.max_nodes)
 
-    if len(graph.nodes()) == 0:
+    if len(list(graph.nodes())) == 0:
         console.print("[yellow]No data found for this graph type[/yellow]")
         return
 
@@ -203,7 +203,7 @@ def cmd_graph(args) -> None:
         console.print(important_nodes)
 
 
-def cmd_search(args) -> None:
+def cmd_search(args: argparse.Namespace) -> None:
     """Handle search subcommand."""
     console = Console()
 
@@ -283,12 +283,13 @@ def cmd_search(args) -> None:
     search_table.add_column("File", style="blue")
     search_table.add_column("Location", style="green")
 
-    for result_type, name, file_path, location in sorted(results)[: args.limit]:
+    for result_type, name, file_path_str, location in sorted(results)[: args.limit]:
         # Shorten file path for display
+        file_path = Path(file_path_str)
         short_path = (
-            str(Path(file_path).relative_to(root_path))
-            if len(file_path) > 50
-            else file_path
+            str(file_path.relative_to(root_path))
+            if len(str(file_path)) > 50
+            else str(file_path)
         )
         search_table.add_row(result_type, name, short_path, location)
 
@@ -300,7 +301,7 @@ def cmd_search(args) -> None:
     console.print(search_table)
 
 
-def cmd_export(args) -> None:
+def cmd_export(args: argparse.Namespace) -> None:
     """Handle export subcommand."""
     console = Console()
 

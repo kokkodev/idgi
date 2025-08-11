@@ -3,7 +3,8 @@ NetworkX graph construction for different types of code relationships.
 """
 
 from enum import Enum
-from typing import Dict, List, Optional
+from pathlib import Path
+from typing import Dict, List, Optional, Union
 
 import networkx as nx
 
@@ -72,7 +73,7 @@ class GraphBuilder:
         self, include_external: bool = False, max_nodes: Optional[int] = None
     ) -> nx.DiGraph:
         """Build module import dependency graph."""
-        graph = nx.DiGraph()
+        graph: nx.DiGraph[str] = nx.DiGraph()
         import_graph = self.analysis_result.import_graph
 
         # Add all modules as nodes first
@@ -124,7 +125,7 @@ class GraphBuilder:
 
     def _build_inheritance_graph(self, max_nodes: Optional[int] = None) -> nx.DiGraph:
         """Build class inheritance graph."""
-        graph = nx.DiGraph()
+        graph: nx.DiGraph[str] = nx.DiGraph()
         inheritance_graph = self.analysis_result.inheritance_graph
 
         node_count = 0
@@ -164,7 +165,7 @@ class GraphBuilder:
 
     def _build_call_graph(self, max_nodes: Optional[int] = None) -> nx.DiGraph:
         """Build function call graph."""
-        graph = nx.DiGraph()
+        graph: nx.DiGraph[str] = nx.DiGraph()
         call_graph = self.analysis_result.call_graph
 
         node_count = 0
@@ -205,7 +206,7 @@ class GraphBuilder:
 
     def _build_module_graph(self, max_nodes: Optional[int] = None) -> nx.DiGraph:
         """Build high-level module relationship graph."""
-        graph = nx.DiGraph()
+        graph: nx.DiGraph[str] = nx.DiGraph()
 
         node_count = 0
         for file_path, module_info in self.analysis_result.modules.items():
@@ -237,7 +238,7 @@ class GraphBuilder:
 
     def _build_class_graph(self, max_nodes: Optional[int] = None) -> nx.DiGraph:
         """Build graph focused on class relationships."""
-        graph = nx.DiGraph()
+        graph: nx.DiGraph[str] = nx.DiGraph()
 
         node_count = 0
         # Add all classes from all modules
@@ -276,7 +277,7 @@ class GraphBuilder:
 
     def _build_function_graph(self, max_nodes: Optional[int] = None) -> nx.DiGraph:
         """Build graph focused on function relationships."""
-        graph = nx.DiGraph()
+        graph: nx.DiGraph[str] = nx.DiGraph()
 
         node_count = 0
         # Add all functions from all modules
@@ -357,7 +358,7 @@ class GraphBuilder:
         current_level = {center_node}
 
         for _ in range(depth):
-            next_level = set()
+            next_level: set[str] = set()
             for node in current_level:
                 # Add predecessors and successors
                 next_level.update(graph.predecessors(node))
@@ -469,7 +470,7 @@ class GraphBuilder:
         return class_name
 
     def _resolve_import(
-        self, importing_module: str, imported_module: str, internal_modules: set
+        self, importing_module: str, imported_module: str, internal_modules: set[str]
     ) -> str:
         """Resolve an import name to a full module name if possible."""
         # If it's already a full module name, return it
@@ -484,13 +485,15 @@ class GraphBuilder:
                 return internal_module
 
         # If not found, return the original import name (likely external)
-        return imported_module
+        return str(imported_module)
 
     @staticmethod
-    def _path_to_module_name(file_path) -> str:
+    def _path_to_module_name(file_path: Union[str, Path]) -> str:
         """Convert a file path to a module name."""
-        path_str = str(file_path)
-        if path_str.endswith("__init__.py"):
+        if isinstance(file_path, str):
+            file_path = Path(file_path)
+
+        if str(file_path).endswith("__init__.py"):
             return str(file_path.parent).replace("/", ".").replace("\\", ".")
         else:
             return str(file_path.with_suffix("")).replace("/", ".").replace("\\", ".")
