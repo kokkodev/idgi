@@ -148,7 +148,7 @@ class GraphExporter:
     ) -> bool:
         """Export to JSON format."""
         if include_attributes:
-            graph_data = nx.node_link_data(graph)
+            graph_data = nx.node_link_data(graph, edges="links")
         else:
             # Create simplified version without attributes
             graph_data = {

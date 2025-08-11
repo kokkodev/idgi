@@ -163,3 +163,5 @@ server_log.txt
 docs/
 API_USAGE_GUIDE.md
 .devcontainer/
+
+test_*

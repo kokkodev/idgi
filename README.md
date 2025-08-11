@@ -3,7 +3,7 @@
 A command-line tool for exploring and visualizing large Python codebases.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
+![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
 
 ## Installation
 
@@ -21,7 +21,7 @@ pip install idgi
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.9 or higher
 
 ### Optional: Graphviz for Visual Exports
 
@@ -103,10 +103,10 @@ idgi search "test" ./my_project --limit 20
 
 ```bash
 # Export all graph types to multiple formats
-idgi export ./my_project --output ./graphs --format svg json
+idgi export ./my_project --output ./graphs --format svg --format json
 
 # Export specific graph types
-idgi export ./my_project --output ./graphs --types imports inheritance
+idgi export ./my_project --output ./graphs --types imports --types inheritance
 ```
 
 ## Usage Guide
@@ -190,7 +190,7 @@ idgi export [OPTIONS] DIRECTORY
 Options:
   --output DIR               Output directory (required)
   --format {svg,png,pdf,json,dot,gml,graphml}
-                             Export formats (default: svg json)
+                             Export formats (can be specified multiple times)
   --types {imports,inheritance,calls,modules,classes,functions}
                              Graph types to export
 ```
@@ -301,7 +301,7 @@ idgi search "View" ./myproject --limit 30
 
 # Export comprehensive analysis
 idgi export ./myproject --output ./analysis \
-  --format svg json --types imports inheritance calls
+  --format svg --format json --types imports --types inheritance --types calls
 ```
 
 ### Large Codebase Analysis
@@ -315,7 +315,7 @@ idgi graph --type imports --interactive ./large_project --max-nodes 200
 
 # Export key relationships only
 idgi export ./large_project --output ./docs \
-  --types imports modules --format svg
+  --types imports --types modules --format svg
 ```
 
 ## License
