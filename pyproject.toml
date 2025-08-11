@@ -5,7 +5,6 @@ description = "A command-line tool for exploring and visualizing large Python co
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Kokko Ng", email = "manuelfdng@gmail.com" }]
-keywords = ["agent", "autogen", "fastapi", "azure"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
