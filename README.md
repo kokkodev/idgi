@@ -129,16 +129,16 @@ Options:
 
 **Example Output:**
 ```
-┌─────────────────┬─────────┐
-│ Metric          │ Count   │
-├─────────────────┼─────────┤
-│ Python files    │ 1,247   │
-│ Total lines     │ 45,123  │
-│ Packages        │ 23      │
-│ Classes         │ 156     │
-│ Functions       │ 489     │
-│ Import statements│ 234    │
-└─────────────────┴─────────┘
+┌──────────────────┬─────────┐
+│ Metric           │ Count   │
+├──────────────────┼─────────┤
+│ Python files     │ 1,247   │
+│ Total lines      │ 45,123  │
+│ Packages         │ 23      │
+│ Classes          │ 156     │
+│ Functions        │ 489     │
+│ Import statements│ 234     │
+└──────────────────┴─────────┘
 ```
 
 #### `graph` - Generate and Display Graphs
