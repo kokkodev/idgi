@@ -38,7 +38,7 @@ sudo apt-get install graphviz
 ### Install from Source (Development)
 
 ```bash
-git clone https://github.com/your-username/idgi.git
+git clone https://github.com/kokkodev/idgi.git
 cd idgi
 uv sync
 ```
@@ -67,10 +67,7 @@ idgi search "MyClass" ./your_project
 idgi scan ./my_project
 
 # Scan with exclusions
-idgi scan ./my_project --exclude venv --exclude tests --exclude "*.pyc"
-
-# Show detailed package breakdown
-idgi scan ./my_project --show-packages --show-errors
+idgi scan ./my_project --exclude venv --exclude tests
 ```
 
 ### 2. Visualize Dependencies
@@ -82,8 +79,11 @@ idgi graph --type imports ./my_project
 # Interactive exploration mode
 idgi graph --type imports --interactive ./my_project
 
-# Export to SVG
+# Export to SVG (using graph command)
 idgi graph --type imports --output dependencies.svg ./my_project
+
+# Or use export command for multiple formats
+idgi export --output ./graphs --format svg --types imports ./my_project
 
 # Show class inheritance hierarchy
 idgi graph --type inheritance --format hierarchy ./my_project
@@ -154,10 +154,11 @@ Options:
   --format {tree,network,hierarchy}
                              Display format (default: network)
   --interactive, -i          Interactive exploration mode
-  --output FILE              Export to file instead of displaying
+  --output OUTPUT            Output file (exports to file instead of display)
   --max-nodes N              Maximum nodes to display
   --depth N                  Tree depth for tree format (default: 3)
   --stats                    Show graph statistics
+  --exclude EXCLUDE          Patterns to exclude
 ```
 
 **Graph Types:**
@@ -177,7 +178,8 @@ Search for specific classes, functions, or modules by name.
 idgi search [OPTIONS] TERM DIRECTORY
 
 Options:
-  --limit N                  Maximum results to show (default: 50)
+  --limit N                  Maximum results to show
+  --exclude EXCLUDE          Patterns to exclude
 ```
 
 #### `export` - Export Graphs to Files
@@ -193,6 +195,7 @@ Options:
                              Export formats (can be specified multiple times)
   --types {imports,inheritance,calls,modules,classes,functions}
                              Graph types to export
+  --exclude EXCLUDE          Patterns to exclude
 ```
 
 **Supported Export Formats:**
@@ -275,14 +278,14 @@ idgi/
 **Performance Tips:**
 
 ```bash
-# Increase worker processes for large projects
-idgi scan ./huge_project --workers 8
+# Use verbose output for debugging
+idgi scan ./project --verbose
 
 # Limit graph size for better performance
 idgi graph --type imports --max-nodes 100 ./project
 
-# Cache results by avoiding frequent exclusion changes
-idgi scan ./project  # Results cached for next run
+# Use exclusion patterns for focused analysis
+idgi scan ./project --exclude tests --exclude docs
 ```
 
 ## Examples
@@ -307,8 +310,8 @@ idgi export ./myproject --output ./analysis \
 ### Large Codebase Analysis
 
 ```bash
-# Scan with performance optimizations
-idgi scan ./large_project --workers 8 --exclude "test_*"
+# Scan with exclusions
+idgi scan ./large_project --exclude "test_*"
 
 # Interactive exploration starting with imports
 idgi graph --type imports --interactive ./large_project --max-nodes 200

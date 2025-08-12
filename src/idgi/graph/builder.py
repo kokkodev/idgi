@@ -229,10 +229,26 @@ class GraphBuilder:
             node_count += 1
 
         # Add relationships based on imports
-        for module, imports in self.analysis_result.import_graph.items():
+        for module_path, imports in self.analysis_result.import_graph.items():
+            # module_path is already in the same format as our node names
+            if module_path not in graph.nodes():
+                continue
+
             for imported_module in imports:
-                if module in graph.nodes() and imported_module in graph.nodes():
-                    graph.add_edge(module, imported_module, relationship="depends_on")
+                # Try direct match first
+                if imported_module in graph.nodes():
+                    graph.add_edge(
+                        module_path, imported_module, relationship="depends_on"
+                    )
+                else:
+                    # Try to find matching module by suffix
+                    for node in graph.nodes():
+                        if (
+                            node.endswith("." + imported_module)
+                            or node == imported_module
+                        ):
+                            graph.add_edge(module_path, node, relationship="depends_on")
+                            break
 
         return graph
 
