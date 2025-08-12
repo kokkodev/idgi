@@ -1,6 +1,6 @@
 [project]
 name = "idgi"
-version = "0.1.0"
+version = "0.1.1"
 description = "A command-line tool for exploring and visualizing large Python codebases"
 readme = "README.md"
 license = { text = "MIT" }
